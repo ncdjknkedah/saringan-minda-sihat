@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saringan Minda Sihat - JKN Kedah</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #fff3e0 100%);
+            min-height: 100vh;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #2dd4bf; border-radius: 4px; }
+
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        .emoji-radio:checked + label { background-color: #ccfbf1; border-color: #14b8a6; transform: scale(1.02); font-weight: bold; }
+        
+        .section-transition { transition: all 0.4s ease-in-out; }
+        .hidden-section { display: none; opacity: 0; }
+        .visible-section { display: block; animation: fadeIn 0.5s forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-active { background-color: #0d9488; color: white; }
+        .step-inactive { background-color: #e5e7eb; color: #9ca3af; }
+
+        /* Icon Styles for 10 B */
+        .icon-box {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; margin-bottom: 0.5rem; flex-shrink: 0;
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 17px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #toast.show {
+            visibility: visible;
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+
+        /* Video Link Style Override */
+        .video-link-overlay {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .video-link-overlay:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* CSS UNTUK PDF TEMPLATE */
+        #pdf-template {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 210mm;
+            background: white;
+            padding: 30px;
+            z-index: -1;
+            font-family: Arial, sans-serif;
+            color: #000;
+        }
+
+        /* CSS KHAS UNTUK CETAKAN (PRINT) */
+        @media print {
+            body { background: white !important; margin: 0; padding: 0;}
+            body > :not(#pdf-template) {
+                display: none !important;
+            }
+            #pdf-template {
+                display: block !important;
+                position: relative !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                z-index: 1 !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            @page { size: A4 portrait; margin: 15mm; }
+        }
+        
+        /* Readonly input styling */
+        input:read-only, select:valid[read-only] {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="text-gray-700">
+
+    <!-- TEMPLATE PDF YANG AKAN DIJANA (OFF-SCREEN) -->
+    <div id="pdf-template">
+        <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/1200px-Coat_of_arms_of_Malaysia.svg.png" style="height: 100px; display: block; margin: 0 auto 10px auto;" alt="Jata Negara">
+            <p style="font-size: 14px; font-weight: bold; margin: 0; text-transform: uppercase;">JABATAN KESIHATAN NEGERI KEDAH</p>
+            <h2 style="font-size: 18px; font-weight: bold; margin: 10px 0 0 0; text-transform: uppercase;">KEPUTUSAN SARINGAN MINDA SIHAT KHAS KAKITANGAN</h2>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #000;">
+            <h4 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 5px;">MAKLUMAT KAKITANGAN</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <tr><td style="padding: 4px; width: 140px; font-weight: bold;">Nama:</td><td id="pdf-name" style="text-transform: uppercase;">-</td></tr>
+                <tr><td style="padding: 4px; font-weight: bold;">No. Kad Pengenalan:</td><td id="pdf-ic">-</td></tr>
+                <tr><td style="padding: 4px; font-weight: bold;">Umur / Jantina:</td><td id="pdf-age">-</td></tr>
+                <tr><td style="padding: 4px; font-weight: bold;">Jawatan / Gred:</td><td id="pdf-jawatan-gred" style="text-transform: uppercase;">-</td></tr>
+                <tr><td style="padding: 4px; font-weight: bold;">Tempat Bertugas:</td><td id="pdf-tempat" style="text-transform: uppercase;">-</td></tr>
+                <tr><td style="padding: 4px; font-weight: bold;">Tarikh Saringan:</td><td id="pdf-date">-</td></tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #000;">
+            <h4 style="margin-top: 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 5px;">KEPUTUSAN SARINGAN</h4>
+            
+            <div style="margin-bottom: 15px; font-size: 13px;">
+                <span style="font-weight: bold;">Status Saringan Awal (Whooley & GAD-2):</span> <span id="pdf-initial-status" style="font-weight: bold;">-</span>
+            </div>
+
+            <div id="pdf-phq-result" style="font-size: 13px; margin-bottom: 15px;"></div>
+            <div id="pdf-gad-result" style="font-size: 13px;"></div>
+        </div>
+
+        <div style="margin-top: 20px; padding: 15px; border: 2px solid #000; background-color: #f9fafb;">
+            <h4 style="margin-top: 0; font-size: 14px; font-weight: bold; margin-bottom: 10px;">TINDAKAN DISYORKAN:</h4>
+            <ul id="pdf-action-text" style="font-size: 13px; font-weight: bold; margin: 0; padding-left: 20px; color: #b91c1c;">
+            </ul>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 15px; font-weight: bold; text-align: center; color: #000; background-color: #e5e7eb; padding: 15px; border: 1px solid #000;">
+            Sila bawa keputusan ini ke klinik kesihatan atau hospital berdekatan untuk mendapatkan bantuan.
+        </div>
+        
+        <div style="text-align: center; font-size: 10px; color: #555; margin-top: 40px; border-top: 1px solid #ccc; padding-top: 10px;">
+            Dokumen ini dijana secara automatik oleh Sistem Saringan Minda Sihat, Jabatan Kesihatan Negeri Kedah.<br>
+            Tidak memerlukan tandatangan.
+        </div>
+    </div>
+    <!-- END TEMPLATE -->
+
+    <!-- Header / Banner -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Coat_of_arms_of_Malaysia.svg/1200px-Coat_of_arms_of_Malaysia.svg.png" alt="Jata Negara" class="h-16 w-auto object-contain">
+                <div class="border-l-2 border-gray-200 pl-3">
+                    <h1 class="text-xl md:text-2xl font-bold text-teal-700 leading-tight">Saringan Minda Sihat</h1>
+                    <p class="text-xs text-gray-600 font-semibold">Jabatan Kesihatan Negeri Kedah</p>
+                    <p class="text-xs text-gray-500">Khas Unuk Kakitangan Kesihatan</p>
+                </div>
+            </div>
+            <button onclick="window.location.reload()" class="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded hover:bg-orange-200 transition no-print">
+                <i class="fas fa-redo mr-1"></i> Reset
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl" id="mainContent">
+
+        <!-- Progress Bar -->
+        <div class="mb-8 no-print">
+            <div class="flex justify-between mb-2">
+                <span class="text-xs font-bold text-teal-600">Maklumat Diri</span>
+                <span class="text-xs font-bold text-teal-600">Saringan Awal</span>
+                <span class="text-xs font-bold text-teal-600">Penilaian Lanjut</span>
+                <span class="text-xs font-bold text-teal-600">Keputusan</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progressBar" class="bg-teal-500 h-2.5 rounded-full transition-all duration-500" style="width: 25%"></div>
+            </div>
+        </div>
+
+        <!-- Section A: Demographics -->
+        <div id="sectionA" class="visible-section bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <div class="mb-6 text-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-teal-800 mb-2">Selamat Datang Warga JKN Kedah!</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">Sila isi maklumat diri anda untuk memulakan Saringan Minda Sihat. <br>Kesihatan mental anda adalah keutamaan kami.</p>
+            </div>
+            
+            <form id="formDemographics" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Nama Penuh</label>
+                        <input type="text" id="nama" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition uppercase" required placeholder="Masukkan nama penuh">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">No. Kad Pengenalan</label>
+                        <input type="text" id="ic" oninput="calculateICDetails()" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition" required placeholder="Contoh: 801231015678" maxlength="12">
+                        <p class="text-[10px] text-gray-500 mt-1">Masukkan tanpa sengkang (-). Umur & jantina akan dikira secara automatik.</p>
+                    </div>
+                    <!-- Auto-calculated fields (read-only for users mainly) -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1 text-gray-700">Umur</label>
+                            <input type="number" id="umur" class="w-full px-4 py-2 rounded-lg border outline-none bg-gray-50 cursor-not-allowed" readonly placeholder="-">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1 text-gray-700">Jantina</label>
+                            <input type="text" id="jantina" class="w-full px-4 py-2 rounded-lg border outline-none bg-gray-50 cursor-not-allowed" readonly placeholder="-">
+                        </div>
+                    </div>
+                    
+                    <!-- New Fields -->
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Jawatan</label>
+                        <input type="text" id="jawatan" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition uppercase" required placeholder="Contoh: Pegawai Perubatan">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Gred</label>
+                        <input type="text" id="gred" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition uppercase" required placeholder="Contoh: UD41">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Daerah</label>
+                        <select id="daerah" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition" required>
+                            <option value="">-- Pilih Daerah --</option>
+                            <option value="IKU">JKN Kedah</option>
+                            <option value="Baling">Baling</option>
+                            <option value="Bandar Baharu">Bandar Baharu</option>
+                            <option value="Kota Setar">Kota Setar</option>
+                            <option value="Kuala Muda">Kuala Muda</option>
+                            <option value="Kubang Pasu">Kubang Pasu</option>
+                            <option value="Kulim">Kulim</option>
+                            <option value="Langkawi">Langkawi</option>
+                            <option value="Padang Terap">Padang Terap</option>
+                            <option value="Pendang">Pendang</option>
+                            <option value="Sik">Sik</option>
+                            <option value="Yan">Yan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Kategori PTJ</label>
+                        <select id="ptj" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition" required>
+                            <option value="">-- Pilih PTJ --</option>
+                            <option value="JKN">JKN</option>
+                            <option value="PKD">PKD (Pejabat Kesihatan Daerah)</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="PKPD">PKPD (Pejabat Kesihatan Pergigian Daerah)</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">Tempat Bertugas (Nama Fasiliti)</label>
+                        <input type="text" id="tempat" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-teal-300 outline-none transition uppercase" required placeholder="Contoh: KLINIK KESIHATAN ALOR SETAR">
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <label class="flex items-start cursor-pointer">
+                        <input type="checkbox" id="pdpa" class="mt-1 mr-3 h-4 w-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500">
+                        <span class="text-xs text-gray-600 leading-tight">
+                            Saya bersetuju untuk memberikan maklumat ini bagi tujuan saringan minda sihat kakitangan. Pihak JKN Kedah menjamin kerahsiaan maklumat anda mengikut Akta Perlindungan Data Peribadi 2010.
+                        </span>
+                    </label>
+                </div>
+                <div class="pt-4 text-center">
+                    <button type="button" onclick="validateAndProceed()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1">
+                        Mula Saringan <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Section B: Whooley & GAD-2 -->
+        <div id="sectionB" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-teal-700 mb-2 border-b pb-2"><i class="fas fa-clipboard-check mr-2"></i>Saringan Awal</h2>
+            <p class="text-sm text-gray-500 mb-6 bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+                Sila jawab soalan berdasarkan pengalaman anda dalam tempoh yang dinyatakan.
+            </p>
+
+            <!-- Whooley -->
+            <div class="mb-8">
+                <h3 class="font-bold text-lg text-indigo-700 mb-4">Bahagian 1: Perasaan (Whooley)</h3>
+                <p class="text-sm text-gray-500 mb-3">Dalam <strong>SEBULAN</strong> yang lepas:</p>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-semibold mb-2">1. Adakah anda merasa murung, sedih atau tiada harapan?</p>
+                        <div class="flex space-x-4">
+                            <div class="flex-1"><input type="radio" name="whooley1" id="w1_y" value="1" class="hidden emoji-radio"><label for="w1_y" class="block text-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 transition">Ya 😔</label></div>
+                            <div class="flex-1"><input type="radio" name="whooley1" id="w1_n" value="0" class="hidden emoji-radio"><label for="w1_n" class="block text-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 transition">Tidak 😊</label></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-semibold mb-2">2. Adakah anda kurang minat atau keseronokan dalam melakukan kerja-kerja?</p>
+                        <div class="flex space-x-4">
+                            <div class="flex-1"><input type="radio" name="whooley2" id="w2_y" value="1" class="hidden emoji-radio"><label for="w2_y" class="block text-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 transition">Ya 😐</label></div>
+                            <div class="flex-1"><input type="radio" name="whooley2" id="w2_n" value="0" class="hidden emoji-radio"><label for="w2_n" class="block text-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 transition">Tidak 😃</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAD-2 -->
+            <div class="mb-8">
+                <h3 class="font-bold text-lg text-indigo-700 mb-4">Bahagian 2: Kebimbangan (GAD-2)</h3>
+                <p class="text-sm text-gray-500 mb-3">Dalam tempoh <strong>2 MINGGU</strong> yang lepas, berapa kerap anda terganggu oleh masalah berikut?</p>
+                <div class="space-y-6">
+                    <div>
+                        <p class="font-semibold mb-2">1. Berasa resah, gelisah atau tegang.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                            <div><input type="radio" name="gad2_1" id="g2_1_0" value="0" class="hidden emoji-radio"><label for="g2_1_0" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">Tiada (0)</label></div>
+                            <div><input type="radio" name="gad2_1" id="g2_1_1" value="1" class="hidden emoji-radio"><label for="g2_1_1" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">Beberapa Hari (1)</label></div>
+                            <div><input type="radio" name="gad2_1" id="g2_1_2" value="2" class="hidden emoji-radio"><label for="g2_1_2" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">> Seminggu (2)</label></div>
+                            <div><input type="radio" name="gad2_1" id="g2_1_3" value="3" class="hidden emoji-radio"><label for="g2_1_3" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">Hampir Setiap Hari (3)</label></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">2. Tidak dapat menghentikan atau mengawal kebimbangan.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                            <div><input type="radio" name="gad2_2" id="g2_2_0" value="0" class="hidden emoji-radio"><label for="g2_2_0" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">Tiada (0)</label></div>
+                            <div><input type="radio" name="gad2_2" id="g2_2_1" value="1" class="hidden emoji-radio"><label for="g2_2_1" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">Beberapa Hari (1)</label></div>
+                            <div><input type="radio" name="gad2_2" id="g2_2_2" value="2" class="hidden emoji-radio"><label for="g2_2_2" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">> Seminggu (2)</label></div>
+                            <div><input type="radio" name="gad2_2" id="g2_2_3" value="3" class="hidden emoji-radio"><label for="g2_2_3" class="h-full flex items-center justify-center border rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center">Hampir Setiap Hari (3)</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between pt-4">
+                <button type="button" onclick="goToSection('sectionA')" class="text-gray-500 hover:text-gray-700 font-semibold px-4">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
+                <button type="button" onclick="processScreening()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transform transition hover:-translate-y-1">
+                    Seterusnya <i class="fas fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Section PHQ-9 -->
+        <div id="sectionPHQ9" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8 border-t-4 border-red-400">
+            <div class="flex items-center mb-4">
+                 <img src="https://cdn-icons-png.flaticon.com/512/3209/3209041.png" class="w-10 h-10 mr-3 opacity-80" alt="Icon">
+                 <h2 class="text-xl font-bold text-red-600">Saringan Lanjut (PHQ-9)</h2>
+            </div>
+            <p class="text-sm text-gray-600 mb-6">Keputusan saringan awal menunjukkan anda mungkin mengalami kemurungan. Sila jawab soalan berikut untuk penilaian lanjut.</p>
+            <div id="phq9_container" class="space-y-6"></div>
+            <div class="flex justify-end pt-6">
+                <button type="button" onclick="finishPHQ9()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                    Simpan Jawapan PHQ-9
+                </button>
+            </div>
+        </div>
+
+        <!-- Section GAD-7 -->
+        <div id="sectionGAD7" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8 border-t-4 border-purple-400 mt-6">
+             <div class="flex items-center mb-4">
+                 <img src="https://cdn-icons-png.flaticon.com/512/5726/5726470.png" class="w-10 h-10 mr-3 opacity-80" alt="Icon">
+                 <h2 class="text-xl font-bold text-purple-600">Saringan Lanjut (GAD-7)</h2>
+            </div>
+            <p class="text-sm text-gray-600 mb-6">Keputusan saringan awal menunjukkan anda mungkin mengalami kebimbangan (Anxiety). Sila jawab soalan berikut.</p>
+            <div id="gad7_container" class="space-y-6"></div>
+            <div class="flex justify-end pt-6">
+                <button type="button" onclick="finishGAD7()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                    Simpan Jawapan GAD-7
+                </button>
+            </div>
+        </div>
+
+        <!-- Section Result -->
+        <div id="sectionResult" class="hidden-section">
+            
+            <div class="bg-white rounded-2xl card-shadow p-8 text-center relative overflow-hidden" id="printArea">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-orange-400"></div>
+                
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Keputusan Saringan</h2>
+                <p class="text-gray-500 mb-8" id="resultDate"></p>
+
+                <!-- Status Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-left">
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-gray-700 mb-2 border-b pb-1">Profil Kakitangan</h4>
+                        <div class="grid grid-cols-2 gap-y-2">
+                            <p class="text-sm col-span-2"><span class="font-semibold text-gray-500">Nama:</span> <br><span id="resName" class="font-bold">-</span></p>
+                            <p class="text-xs"><span class="font-semibold text-gray-500">No KP:</span> <br><span id="resIC">-</span></p>
+                            <p class="text-xs"><span class="font-semibold text-gray-500">Umur & Jantina:</span> <br><span id="resAgeGender">-</span></p>
+                            <p class="text-xs"><span class="font-semibold text-gray-500">Jawatan/Gred:</span> <br><span id="resJob">-</span></p>
+                            <p class="text-xs"><span class="font-semibold text-gray-500">Daerah:</span> <br><span id="resDistrict">-</span></p>
+                            <p class="text-xs col-span-2"><span class="font-semibold text-gray-500">Tempat Bertugas (PTJ):</span> <br><span id="resFacility">-</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-xl border border-teal-200 flex items-center justify-center flex-col text-center">
+                        <div id="overallIcon" class="text-4xl mb-2"></div>
+                        <h3 id="overallStatus" class="text-xl font-bold text-teal-800"></h3>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown -->
+                <div id="detailedResults" class="space-y-6 text-left"></div>
+
+                <!-- Risk Alert & MySejahtera Buttons (Visible only if AT RISK) -->
+                <div id="riskAlertSection" class="hidden mt-8">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg text-center shadow-md mb-6">
+                        <i class="fas fa-heart text-red-500 text-4xl mb-3 animate-pulse"></i>
+                        <h3 class="text-xl font-bold text-red-800 mb-2">Rakan Setugas, Anda Berharga!</h3>
+                        <p class="text-gray-700">Sila dapatkan temujanji di klinik kesihatan yang berdekatan anda atau melalui aplikasi mySejahtera untuk sokongan dari rakan kesihatan profesional.</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wide">Muat turun Aplikasi MySejahtera</p>
+                        <div class="flex flex-col sm:flex-row justify-center gap-4">
+                            <!-- Play Store Button -->
+                            <a href="https://play.google.com/store/search?q=mysejahtera&c=apps&hl=en" target="_blank" class="flex items-center justify-center bg-black text-white px-6 py-3 rounded-xl shadow-lg hover:bg-gray-800 transition transform hover:-translate-y-1">
+                                <i class="fab fa-google-play text-2xl mr-3 text-teal-400"></i>
+                                <div class="text-left">
+                                    <div class="text-[10px] uppercase">Dapatkan di</div>
+                                    <div class="text-lg font-bold leading-none">Google Play</div>
+                                </div>
+                            </a>
+                            
+                            <!-- App Store Button -->
+                            <a href="https://apps.apple.com/my/app/mysejahtera/id1504055630" target="_blank" class="flex items-center justify-center bg-black text-white px-6 py-3 rounded-xl shadow-lg hover:bg-gray-800 transition transform hover:-translate-y-1">
+                                <i class="fab fa-apple text-2xl mr-3"></i>
+                                <div class="text-left">
+                                    <div class="text-[10px] uppercase">Muat Turun di</div>
+                                    <div class="text-lg font-bold leading-none">App Store</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10 B Education Section -->
+                <div id="educationSection" class="hidden muka-surat-baharu mt-10 text-left bg-blue-50 p-6 md:p-8 rounded-xl border border-blue-200 shadow-sm relative">
+                     <div class="absolute top-0 left-0 w-full h-1 bg-blue-400"></div>
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-blue-900 flex items-center">
+                            <i class="fas fa-book-reader mr-3 bg-blue-100 p-2 rounded-full text-blue-600"></i> 
+                            Jom Jaga Minda: Ambil Peduli Kesihatan Mental
+                        </h3>
+                        <p class="text-gray-600 mt-2">Panduan Pengurusan Emosi Kendiri & Teknik 10 B untuk mengekalkan kesejahteraan mental anda.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 mb-8">
+                        <h4 class="font-bold text-lg text-blue-800 mb-3"><i class="fas fa-info-circle mr-2"></i>Apa itu Kesihatan Mental?</h4>
+                        <p class="text-gray-700 italic leading-relaxed">
+                            "Kesihatan mental adalah satu keadaan di mana seseorang individu itu menyedari potensi dirinya, boleh berdaya tindak terhadap stres kehidupan sehari-hari, boleh bekerja dengan produktif dan boleh menyumbang kepada masyarakat." (WHO 2001)
+                        </p>
+                    </div>
+
+                    <!-- Video 1 & 2 -->
+                    <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center"><i class="fab fa-youtube text-red-600 text-xl mr-2"></i> Kepentingan Kesihatan Mental</h4>
+                            <a href="https://www.youtube.com/watch?v=ZZcYfbXDhVU" target="_blank" class="block relative group rounded-lg overflow-hidden border border-gray-200 video-link">
+                                <img src="https://img.youtube.com/vi/ZZcYfbXDhVU/mqdefault.jpg" class="w-full object-cover h-40 group-hover:scale-105 transition duration-300">
+                                <div class="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center group-hover:bg-opacity-20 transition video-link-overlay">
+                                    <div class="bg-red-600 text-white rounded-full p-3 shadow-lg transform group-hover:scale-110 transition"><i class="fas fa-play text-xl ml-1"></i></div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center"><i class="fas fa-hand-holding-heart text-pink-600 text-xl mr-2"></i> Hentikan Stigma</h4>
+                             <a href="https://drive.google.com/file/d/1ylwkqRZQXiWFxQRvyhd2DFoLMjyi_aki/view?usp=sharing" target="_blank" class="block relative group rounded-lg overflow-hidden border border-gray-200 video-link bg-gray-100 h-40 flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-video text-4xl text-gray-400 mb-2"></i>
+                                    <p class="text-xs text-gray-500 font-semibold">Tonton Video di Google Drive</p>
+                                </div>
+                                <div class="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center group-hover:bg-opacity-20 transition video-link-overlay">
+                                    <div class="bg-blue-600 text-white rounded-full p-3 shadow-lg transform group-hover:scale-110 transition"><i class="fas fa-play text-xl ml-1"></i></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <h4 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2 mt-8">Teknik Penjagaan Kesihatan Mental Kendiri (10 B)</h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        <!-- 1. Bersyukur -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-yellow-100 text-yellow-600 mr-3"><i class="fas fa-praying-hands"></i></div>
+                                <h4 class="font-bold text-gray-800">1. Bersyukur</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12 space-y-1">
+                                <p class="mb-2">Menghargai nikmat yang diterima.</p>
+                                <ul class="list-disc list-inside"><li>Tulis 5 perkara yang disyukuri setiap hari.</li><li>Tulis 3 perkara positif yang berlaku hari ini.</li></ul>
+                            </div>
+                        </div>
+
+                        <!-- 2. Bernafas (Updated with 3 Videos) -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-blue-100 text-blue-600 mr-3"><i class="fas fa-lungs"></i></div>
+                                <h4 class="font-bold text-gray-800">2. Bernafas dengan Teratur</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12 mb-2">
+                                <p>Mengurangkan stres, tekanan darah & ketegangan saraf.</p>
+                            </div>
+                            <!-- Video Grid for Breathing -->
+                            <div class="grid grid-cols-1 gap-2 mt-2 no-print">
+                                <!-- Wave Surfing -->
+                                <a href="https://drive.google.com/file/d/1vSDctVSYZ_-yjv7zaAy5HFogKYnWats0/view?usp=sharing" target="_blank" class="flex items-center p-2 border rounded hover:bg-gray-50 transition video-link">
+                                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-water"></i></div>
+                                    <div class="text-xs font-bold text-gray-700">Teknik Wave Surfing <span class="block text-[10px] text-gray-500 font-normal">Tonton Video</span></div>
+                                    <i class="fas fa-play-circle text-gray-400 ml-auto text-lg"></i>
+                                </a>
+                                <!-- Belon -->
+                                <a href="https://drive.google.com/file/d/1bmFjoaZ76olCPKgBV8nEnpo0dQLCsJ3a/view?usp=sharing" target="_blank" class="flex items-center p-2 border rounded hover:bg-gray-50 transition video-link">
+                                    <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-wind"></i></div>
+                                    <div class="text-xs font-bold text-gray-700">Teknik Pernafasan Belon <span class="block text-[10px] text-gray-500 font-normal">Tonton Video</span></div>
+                                    <i class="fas fa-play-circle text-gray-400 ml-auto text-lg"></i>
+                                </a>
+                                <!-- Coffee Break -->
+                                <a href="https://drive.google.com/file/d/1RsAJ3mtNhnsGQ_70xG353FWiXg1ySvLe/view?usp=sharing" target="_blank" class="flex items-center p-2 border rounded hover:bg-gray-50 transition video-link">
+                                    <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-coffee"></i></div>
+                                    <div class="text-xs font-bold text-gray-700">Teknik Coffee Break <span class="block text-[10px] text-gray-500 font-normal">Tonton Video</span></div>
+                                    <i class="fas fa-play-circle text-gray-400 ml-auto text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 3. Bicara Diri -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-green-100 text-green-600 mr-3"><i class="fas fa-comments"></i></div>
+                                <h4 class="font-bold text-gray-800">3. Bicara Diri (Self-Talk)</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12"><p>Grounding (5-4-3-2-1), Normalizing, Self Affirmation.</p></div>
+                        </div>
+
+                        <!-- 4. Beribadat -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-purple-100 text-purple-600 mr-3"><i class="fas fa-mosque"></i></div>
+                                <h4 class="font-bold text-gray-800">4. Beribadat</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12"><p>Berharap pada Tuhan & jalankan suruhan agama.</p></div>
+                        </div>
+
+                        <!-- 5. Berkongsi Perasaan -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-pink-100 text-pink-600 mr-3"><i class="fas fa-user-friends"></i></div>
+                                <h4 class="font-bold text-gray-800">5. Berkongsi Perasaan</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12"><p>Luahkan kepada orang yang dipercayai di tempat yang tenang.</p></div>
+                        </div>
+
+                        <!-- 6. Berurut (Updated with Thumbnail) -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-orange-100 text-orange-600 mr-3"><i class="fas fa-spa"></i></div>
+                                <h4 class="font-bold text-gray-800">6. Berurut</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12">
+                                <p class="mb-2">Kurangkan kesakitan & ketegangan otot.</p>
+                                <a href="https://youtu.be/d8XKaBODwYo?si=QkQS3_dArlSWAnTm" target="_blank" class="block relative group rounded-lg overflow-hidden border border-gray-200 mt-2 no-print video-link">
+                                    <img src="https://img.youtube.com/vi/d8XKaBODwYo/mqdefault.jpg" class="w-full object-cover h-24 group-hover:scale-105 transition duration-300">
+                                    <div class="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center group-hover:bg-opacity-20 transition video-link-overlay">
+                                        <div class="bg-red-600 text-white rounded-full p-2"><i class="fas fa-play ml-1"></i></div>
+                                    </div>
+                                    <div class="bg-gray-800 text-white text-[10px] text-center py-1">Video Teknik Urutan</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 7. Berehat & Muzik -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-indigo-100 text-indigo-600 mr-3"><i class="fas fa-music"></i></div>
+                                <h4 class="font-bold text-gray-800">7. Berehat & Muzik</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12"><p>Muzik menenangkan badan & minda (Dopamin).</p></div>
+                        </div>
+
+                        <!-- 8. Beriadah -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-teal-100 text-teal-600 mr-3"><i class="fas fa-hiking"></i></div>
+                                <h4 class="font-bold text-gray-800">8. Beriadah</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12"><p>Alihkan tumpuan dari masalah harian.</p></div>
+                        </div>
+
+                        <!-- 9. Bersenam -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-red-100 text-red-600 mr-3"><i class="fas fa-running"></i></div>
+                                <h4 class="font-bold text-gray-800">9. Bersenam</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12 mb-2">
+                                <p>Meningkatkan hormon Endorfin.</p>
+                            </div>
+                            <!-- Video Grid for Exercise -->
+                            <div class="grid grid-cols-1 gap-2 mt-2 no-print">
+                                <!-- Ballet -->
+                                <a href="https://drive.google.com/file/d/1NDb3iLzCrCNUVTpEMzRHXfLRaWBs-NQB/view?usp=sharing" target="_blank" class="flex items-center p-2 border rounded hover:bg-gray-50 transition video-link">
+                                    <div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-child"></i></div>
+                                    <div class="text-xs font-bold text-gray-700">Teknik Ballet Dance <span class="block text-[10px] text-gray-500 font-normal">Tonton Video</span></div>
+                                    <i class="fas fa-play-circle text-gray-400 ml-auto text-lg"></i>
+                                </a>
+                                <!-- Muscle Relaxation -->
+                                <a href="https://drive.google.com/file/d/1L4H7QW0cUma3ZNUkj9rC07OQ5jtz5ZVY/view?usp=sharing" target="_blank" class="flex items-center p-2 border rounded hover:bg-gray-50 transition video-link">
+                                    <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-dumbbell"></i></div>
+                                    <div class="text-xs font-bold text-gray-700">Progressive Muscle Relaxation <span class="block text-[10px] text-gray-500 font-normal">Tonton Video</span></div>
+                                    <i class="fas fa-play-circle text-gray-400 ml-auto text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 10. Berfikiran Positif -->
+                        <div class="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                            <div class="flex items-center mb-2">
+                                <div class="icon-box bg-yellow-100 text-yellow-500 mr-3"><i class="fas fa-lightbulb"></i></div>
+                                <h4 class="font-bold text-gray-800">10. Berfikiran Positif</h4>
+                            </div>
+                            <div class="text-xs text-gray-600 pl-12"><p>Melihat kebaikan dalam situasi negatif.</p></div>
+                        </div>
+                    </div>
+
+                    <!-- IDEAL Stress Management -->
+                    <div class="mt-8 bg-white p-6 rounded-xl border-2 border-indigo-100">
+                        <h4 class="text-lg font-bold text-indigo-800 mb-4 text-center">Pengurusan Stres: Konsep I.D.E.A.L</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
+                            <div class="p-3 bg-indigo-50 rounded-lg"><div class="text-2xl font-black text-indigo-600 mb-1">I</div><div class="text-xs font-bold text-gray-700">IDENTIFY</div><div class="text-[10px] text-gray-500 leading-tight mt-1">Kenalpasti masalah.</div></div>
+                            <div class="p-3 bg-indigo-50 rounded-lg"><div class="text-2xl font-black text-indigo-600 mb-1">D</div><div class="text-xs font-bold text-gray-700">DESCRIBE</div><div class="text-[10px] text-gray-500 leading-tight mt-1">Cari penyelesaian.</div></div>
+                            <div class="p-3 bg-indigo-50 rounded-lg"><div class="text-2xl font-black text-indigo-600 mb-1">E</div><div class="text-xs font-bold text-gray-700">EVALUATE</div><div class="text-[10px] text-gray-500 leading-tight mt-1">Nilai baik buruk.</div></div>
+                            <div class="p-3 bg-indigo-50 rounded-lg"><div class="text-2xl font-black text-indigo-600 mb-1">A</div><div class="text-xs font-bold text-gray-700">ACT</div><div class="text-[10px] text-gray-500 leading-tight mt-1">Bertindak.</div></div>
+                            <div class="p-3 bg-indigo-50 rounded-lg"><div class="text-2xl font-black text-indigo-600 mb-1">L</div><div class="text-xs font-bold text-gray-700">LEARN</div><div class="text-[10px] text-gray-500 leading-tight mt-1">Belajar dari pengalaman.</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HEAL Banner (For everyone) -->
+                <div class="mt-8 bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between no-print">
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold flex items-center justify-center md:justify-start">
+                            <i class="fas fa-phone-volume mr-2 animate-pulse"></i> PERLUKAN BANTUAN?
+                        </h3>
+                        <p class="text-sm text-purple-100">Hubungi Talian Bantuan Krisis Kesihatan Mental (HEAL)</p>
+                        <p class="text-xs text-purple-200 mt-1">Help with Empathy and Love</p>
+                    </div>
+                    <a href="tel:15555" class="text-center bg-white text-purple-800 px-6 py-2 rounded-full font-bold text-2xl shadow-md cursor-pointer hover:bg-gray-100 transition transform hover:scale-105 inline-block no-underline">
+                        <i class="fas fa-phone-alt mr-2 text-lg"></i>15555
+                    </a>
+                </div>
+                
+                <!-- Footer Actions -->
+                <div class="mt-10 flex flex-col md:flex-row justify-center space-y-3 md:space-y-0 md:space-x-4 no-print">
+                    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow flex items-center justify-center transition transform hover:scale-105">
+                        <i class="fas fa-print mr-2"></i> Cetak Keputusan
+                    </button>
+                    <button onclick="window.location.reload()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow flex items-center justify-center">
+                        <i class="fas fa-redo mr-2"></i> Saringan Baru
+                    </button>
+                </div>
+                <div class="mt-8 text-xs text-gray-400 italic">
+                    *Keputusan ini adalah saringan awal sahaja dan bukan diagnosis muktamad. Sila rujuk pakar perubatan untuk pengesahan.
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast">Data sedang dihantar ke pangkalan data...</div>
+
+    </main>
+
+    <!-- Footer Updated -->
+    <footer class="bg-teal-800 text-teal-100 py-6 mt-12 no-print">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-bold">Jabatan Kesihatan Negeri Kedah</p>
+            <p class="text-sm opacity-80">&copy; 2025 Unit NCD JKN Kedah</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // CONFIGURATION
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyprpBvGhbxmaSe47PG5ixL91HgbBFKLMRcUzYORoynNzsnE_yYlg8qLUyEmg16jG2I/exec"; 
+
+        // Data Questions
+        const phq9Questions = [
+            "Sedikit minat atau keseronokan dalam melakukan kerja-kerja.",
+            "Merasa murung, sedih atau tiada harapan.",
+            "Masalah hendak tidur / semasa tidur, tidur terlalu banyak.",
+            "Merasa letih atau kurang bertenaga.",
+            "Kurang selera atau terlalu banyak makan.",
+            "Mempunyai perasaan buruk terhadap diri sendiri - atau merasa gagal.",
+            "Masalah menumpukan perhatian (contoh: membaca, menonton TV).",
+            "Bergerak/bercakap terlalu lambat ATAU terlalu resah/gelisah.",
+            "Berfikiran bahawa lebih elok jika anda telah mati atau ingin mencederakan diri."
+        ];
+
+        const gad7Questions = [
+            "Berasa resah, gelisah atau tegang.",
+            "Tidak dapat menghentikan atau mengawal kebimbangan.",
+            "Terlalu bimbang mengenai pelbagai perkara yang berlainan.",
+            "Mempunyai masalah untuk bertenang.",
+            "Terlalu resah sehingga susah untuk berdiam diri.",
+            "Mudah menjadi rimas dan menjengkelkan.",
+            "Berasa takut bahawa sesuatu yang buruk akan terjadi."
+        ];
+
+        // State Management
+        let state = {
+            whooley: false, 
+            gad2: false,    
+            phq9Score: 0,
+            gad7Score: 0,
+            needsPHQ9: false,
+            needsGAD7: false,
+            phqLevel: "", 
+            gadLevel: "",
+            suicideRisk: false  
+        };
+
+        // Initialize Dynamic Questions
+        function renderQuestions(containerId, questions, prefix) {
+            const container = document.getElementById(containerId);
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 ${prefix === 'phq' ? 'border-red-300' : 'border-purple-300'}">
+                    <p class="font-semibold mb-3 text-gray-800">${index + 1}. ${q}</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs md:text-sm">
+                        ${generateRadio(prefix, index, 0, "Tiada (0)")}
+                        ${generateRadio(prefix, index, 1, "Beberapa hari (1)")}
+                        ${generateRadio(prefix, index, 2, "> Seminggu (2)")}
+                        ${generateRadio(prefix, index, 3, "Hampir setiap hari (3)")}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function generateRadio(prefix, qIndex, value, label) {
+            return `
+            <div>
+                <input type="radio" name="${prefix}_${qIndex}" id="${prefix}_${qIndex}_${value}" value="${value}" class="hidden emoji-radio" required>
+                <label for="${prefix}_${qIndex}_${value}" class="h-full flex items-center justify-center border bg-white rounded-lg p-2 cursor-pointer hover:bg-gray-100 text-center shadow-sm">${label}</label>
+            </div>`;
+        }
+
+        // Auto-calculate IC Details dynamically when user types
+        function calculateICDetails() {
+            const icInput = document.getElementById('ic').value.trim();
+            const umurField = document.getElementById('umur');
+            const jantinaField = document.getElementById('jantina');
+            
+            if(icInput.length === 12 && /^\d{12}$/.test(icInput)) {
+                const yearPart = icInput.substring(0, 2);
+                const monthPart = icInput.substring(2, 4);
+                const dayPart = icInput.substring(4, 6);
+                
+                const currentYear = new Date().getFullYear() % 100;
+                const century = (parseInt(yearPart) > currentYear) ? "19" : "20";
+                const fullYear = century + yearPart;
+                
+                const today = new Date();
+                let age = today.getFullYear() - parseInt(fullYear);
+                
+                const lastDigit = parseInt(icInput.charAt(11));
+                const gender = (lastDigit % 2 === 0) ? "Perempuan" : "Lelaki";
+                
+                umurField.value = age;
+                jantinaField.value = gender;
+            } else {
+                umurField.value = "";
+                jantinaField.value = "";
+            }
+        }
+
+        function validateAndProceed() {
+            const nama = document.getElementById('nama').value.trim();
+            const ic = document.getElementById('ic').value.trim();
+            const jawatan = document.getElementById('jawatan').value.trim();
+            const gred = document.getElementById('gred').value.trim();
+            const daerah = document.getElementById('daerah').value;
+            const ptj = document.getElementById('ptj').value;
+            const tempat = document.getElementById('tempat').value.trim();
+            const pdpa = document.getElementById('pdpa').checked;
+
+            if (!pdpa) {
+                alert("Sila tanda kotak persetujuan perlindungan data untuk meneruskan.");
+                return;
+            }
+
+            if (!nama || !ic || !jawatan || !gred || !daerah || !ptj || !tempat) {
+                alert("Sila lengkapkan semua maklumat diri.");
+                return;
+            }
+
+            // Validasi IC
+            const icRegex = /^\d{12}$/;
+            if (!icRegex.test(ic)) {
+                alert("Nombor IC mestilah 12 digit tanpa simbol '-' / ruang kosong.");
+                return;
+            }
+
+            // Pastikan autocalculate berjaya
+            if (!document.getElementById('umur').value) {
+                calculateICDetails(); 
+            }
+
+            // Jika semua OK, terus ke saringan
+            goToSection('sectionB');
+        }
+
+        // Navigation
+        function goToSection(sectionId) {
+            document.querySelectorAll('main > div[id^="section"]').forEach(el => {
+                el.classList.add('hidden-section');
+                el.classList.remove('visible-section');
+            });
+            const target = document.getElementById(sectionId);
+            target.classList.remove('hidden-section');
+            target.classList.add('visible-section');
+
+            const progress = document.getElementById('progressBar');
+            if(sectionId === 'sectionA') progress.style.width = '25%';
+            if(sectionId === 'sectionB') progress.style.width = '50%';
+            if(sectionId === 'sectionPHQ9' || sectionId === 'sectionGAD7') progress.style.width = '75%';
+            if(sectionId === 'sectionResult') progress.style.width = '100%';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Processing Logic
+        function processScreening() {
+            const w1 = document.querySelector('input[name="whooley1"]:checked');
+            const w2 = document.querySelector('input[name="whooley2"]:checked');
+            
+            if (!w1 || !w2) { alert("Sila jawab semua soalan Whooley."); return; }
+            
+            state.whooley = (w1.value === '1' || w2.value === '1');
+
+            const g1 = document.querySelector('input[name="gad2_1"]:checked');
+            const g2 = document.querySelector('input[name="gad2_2"]:checked');
+
+            if (!g1 || !g2) { alert("Sila jawab semua soalan GAD-2."); return; }
+
+            const gad2Score = parseInt(g1.value) + parseInt(g2.value);
+            state.gad2 = (gad2Score >= 3); 
+
+            state.needsPHQ9 = state.whooley;
+            state.needsGAD7 = state.gad2;
+
+            if (state.needsPHQ9) {
+                renderQuestions('phq9_container', phq9Questions, 'phq');
+                goToSection('sectionPHQ9');
+            } else if (state.needsGAD7) {
+                renderQuestions('gad7_container', gad7Questions, 'gad');
+                goToSection('sectionGAD7');
+            } else {
+                showResults();
+            }
+        }
+
+        function finishPHQ9() {
+            let total = 0;
+            let answered = 0;
+            let q9Value = 0; 
+
+            for(let i=0; i<9; i++) {
+                const q = document.querySelector(`input[name="phq_${i}"]:checked`);
+                if(q) {
+                    let currentVal = parseInt(q.value); 
+                    total += currentVal;
+                    answered++;
+                    if(i === 8) { q9Value = currentVal; }
+                }
+            }
+
+            if(answered < 9) { 
+                alert("Sila jawab semua soalan PHQ-9."); 
+                return; 
+            }
+
+            state.phq9Score = total;
+            state.suicideRisk = (q9Value > 0);
+
+            if (state.needsGAD7) {
+                renderQuestions('gad7_container', gad7Questions, 'gad');
+                goToSection('sectionGAD7');
+            } else {
+                showResults();
+            }
+        }
+
+        function finishGAD7() {
+            let total = 0;
+            let answered = 0;
+            for(let i=0; i<7; i++) {
+                const q = document.querySelector(`input[name="gad_${i}"]:checked`);
+                if(q) {
+                    total += parseInt(q.value);
+                    answered++;
+                }
+            }
+
+            if(answered < 7) { alert("Sila jawab semua soalan GAD-7."); return; }
+            state.gad7Score = total;
+
+            showResults();
+        }
+
+        function getPHQAction(score, hasSuicideRisk) {
+            if (hasSuicideRisk === true) {
+                return { 
+                    level: "BERISIKO (KECEMASAN)", 
+                    color: "text-red-700", 
+                    action: "<span class='text-red-600 animate-pulse font-black underline'>AMARAN KECEMASAN:</span> Anda telah menyatakan adanya pemikiran untuk mencederakan diri atau mati. Sila <strong>SEGERA</strong> ke Unit Kecemasan Hospital atau Klinik Kesihatan terdekat <strong>SEKARANG</strong> untuk penilaian keselamatan. Anda juga boleh hubungi talian HEAL 15555 dengan segera." 
+                };
+            }
+
+            if(score <= 4) return { level: "NORMAL", color: "text-green-600", action: "Teruskan amalan cara hidup sihat. Jaga kesihatan mental." };
+            if(score <= 9) return { level: "RINGAN", color: "text-yellow-600", action: "Kongsikan masalah dengan mereka yang anda percayai atau berbincang dengan penyelia / pasukan sokongan." };
+            if(score <= 14) return { level: "SEDERHANA", color: "text-orange-600", action: "Dapatkan bantuan di klinik kesihatan yang berdekatan atau melalui kaunselor jabatan." };
+            if(score <= 19) return { level: "TERUK", color: "text-red-600", action: "<strong>SEGERA</strong> dapatkan bantuan dari klinik kesihatan atau hospital yang berdekatan." };
+            return { level: "SANGAT TERUK", color: "text-red-800", action: "<strong>SEGERA</strong> dapatkan bantuan dari klinik kesihatan atau hospital yang berdekatan." };
+        }
+
+        function getGADAction(score) {
+            if(score <= 4) return { level: "NORMAL", color: "text-green-600", action: "Teruskan amalan cara hidup sihat. Amalkan teknik relaksasi." };
+            if(score <= 9) return { level: "RINGAN", color: "text-yellow-600", action: "Kongsikan kebimbangan anda dengan rakan sekerja atau ahli keluarga yang dipercayai." };
+            if(score <= 14) return { level: "SEDERHANA", color: "text-orange-600", action: "Dapatkan bantuan psikosial di klinik kesihatan yang berdekatan." };
+            return { level: "TERUK", color: "text-red-600", action: "<strong>SEGERA</strong> dapatkan bantuan dari klinik kesihatan atau hospital yang berdekatan." };
+        }
+
+        function preparePrintData() {
+            document.getElementById('pdf-name').textContent = document.getElementById('nama').value.toUpperCase();
+            document.getElementById('pdf-ic').textContent = document.getElementById('ic').value;
+            document.getElementById('pdf-age').textContent = document.getElementById('umur').value + " / " + document.getElementById('jantina').value;
+            document.getElementById('pdf-jawatan-gred').textContent = document.getElementById('jawatan').value.toUpperCase() + " / " + document.getElementById('gred').value.toUpperCase();
+            document.getElementById('pdf-tempat').textContent = document.getElementById('tempat').value.toUpperCase() + " (" + document.getElementById('ptj').value + " " + document.getElementById('daerah').value + ")";
+            document.getElementById('pdf-date').textContent = new Date().toLocaleDateString('ms-MY');
+
+            let isTotallyHealthy = !state.needsPHQ9 && !state.needsGAD7;
+            const statusAwal = (state.whooley || state.gad2) ? "BERISIKO" : "TIDAK BERISIKO";
+            document.getElementById('pdf-initial-status').textContent = statusAwal;
+
+            let phqHTML = "";
+            let actionTextHTML = "";
+
+            if(isTotallyHealthy) {
+                actionTextHTML += `<li>Teruskan amalan cara hidup sihat. Anda mempunyai tahap kesihatan mental yang baik.</li>`;
+            }
+
+            if(state.needsPHQ9) {
+                const color = state.suicideRisk ? "color: #b91c1c; font-weight: bold;" : "";
+                phqHTML = `<div style="padding: 10px; border-left: 4px solid #b91c1c; margin-bottom: 10px; background: #fef2f2;">
+                    <strong>Kemurungan (PHQ-9):</strong> SKOR <strong>${state.phq9Score}/27</strong> <span style="${color}">(${state.phqLevel})</span>
+                </div>`;
+                const phqRes = getPHQAction(state.phq9Score, state.suicideRisk);
+                actionTextHTML += `<li>${phqRes.action.replace(/<[^>]*>?/gm, '')}</li>`;
+            }
+            document.getElementById('pdf-phq-result').innerHTML = phqHTML;
+
+            let gadHTML = "";
+            if(state.needsGAD7) {
+                gadHTML = `<div style="padding: 10px; border-left: 4px solid #7e22ce; background: #faf5ff;">
+                    <strong>Kebimbangan (GAD-7):</strong> SKOR <strong>${state.gad7Score}/21</strong> <span>(${state.gadLevel})</span>
+                </div>`;
+                const gadRes = getGADAction(state.gad7Score);
+                actionTextHTML += `<li>${gadRes.action.replace(/<[^>]*>?/gm, '')}</li>`;
+            }
+            document.getElementById('pdf-gad-result').innerHTML = gadHTML;
+            document.getElementById('pdf-action-text').innerHTML = actionTextHTML;
+        }
+
+        function showResults() {
+            // Populate Demographics for UI
+            const namaval = document.getElementById('nama').value.toUpperCase() || "PESERTA";
+            const icval = document.getElementById('ic').value || "-";
+            const umurval = document.getElementById('umur').value || "-";
+            const jantinaval = document.getElementById('jantina').value || "-";
+            const jawatanval = document.getElementById('jawatan').value.toUpperCase() || "-";
+            const gredval = document.getElementById('gred').value.toUpperCase() || "-";
+            const daerahval = document.getElementById('daerah').value || "-";
+            const ptjval = document.getElementById('ptj').value || "-";
+            const tempatval = document.getElementById('tempat').value.toUpperCase() || "-";
+            
+            document.getElementById('resName').textContent = namaval;
+            document.getElementById('resIC').textContent = icval;
+            document.getElementById('resAgeGender').textContent = umurval + " Tahun / " + jantinaval;
+            document.getElementById('resJob').textContent = jawatanval + " (" + gredval + ")";
+            document.getElementById('resDistrict').textContent = daerahval;
+            document.getElementById('resFacility').textContent = tempatval + " (" + ptjval + ")";
+
+            const today = new Date();
+            document.getElementById('resultDate').textContent = today.toLocaleDateString('ms-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            const detailContainer = document.getElementById('detailedResults');
+            const educationSection = document.getElementById('educationSection');
+            const riskAlertSection = document.getElementById('riskAlertSection');
+            
+            detailContainer.innerHTML = "";
+            educationSection.classList.add('hidden'); 
+            riskAlertSection.classList.add('hidden');
+
+            let isTotallyHealthy = !state.needsPHQ9 && !state.needsGAD7;
+            let showEducation = false;
+            let overallRisk = (state.whooley || state.gad2) ? "BERISIKO" : "TIDAK BERISIKO";
+
+            if(isTotallyHealthy) {
+                document.getElementById('overallIcon').innerHTML = "🌟";
+                document.getElementById('overallStatus').textContent = "STATUS KESIHATAN MENTAL ANDA ADALAH BAIK";
+                document.getElementById('overallStatus').className = "text-xl font-bold text-green-600";
+                
+                detailContainer.innerHTML = `
+                <div class="bg-green-50 border border-green-200 p-6 rounded-xl text-center">
+                    <i class="fas fa-smile-beam text-5xl text-green-500 mb-3"></i>
+                    <p class="text-lg text-green-800">Saringan Whooley dan GAD-2 menunjukkan anda mempunyai tahap kesihatan mental yang baik. Teruskan semangat juang dan amalan gaya hidup sihat!</p>
+                </div>`;
+                showEducation = true; 
+            } else {
+                document.getElementById('overallIcon').innerHTML = "📋";
+                document.getElementById('overallStatus').textContent = "ANDA MUNGKIN MEMERLUKAN BANTUAN";
+                document.getElementById('overallStatus').className = "text-xl font-bold text-orange-600";
+                
+                // Show Risk Alert for staff
+                riskAlertSection.classList.remove('hidden');
+            }
+
+            if(state.needsPHQ9) {
+                const phqRes = getPHQAction(state.phq9Score, state.suicideRisk);
+                state.phqLevel = phqRes.level; 
+                if (state.phq9Score <= 9) showEducation = true;
+                
+                if (state.suicideRisk) {
+                    riskAlertSection.classList.remove('hidden');
+                }
+               detailContainer.innerHTML += `
+                <div class="bg-white border-l-8 ${state.suicideRisk ? 'border-red-700 bg-red-50' : 'border-red-500'} rounded-lg shadow-sm p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-lg text-gray-800">Keputusan Kemurungan (PHQ-9)</h4>
+                            <div class="text-3xl font-extrabold ${phqRes.color} mt-2">${state.phq9Score}/27</div>
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-white border ${phqRes.color} mt-1">${phqRes.level}</span>
+                        </div>
+                        <i class="fas ${state.suicideRisk ? 'fa-exclamation-triangle text-red-600' : 'fa-brain text-red-200'} text-5xl"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <p class="text-sm font-semibold text-gray-600">Tindakan Disyorkan:</p>
+                        <p class="text-gray-800">${phqRes.action}</p>
+                    </div>
+                </div>`;
+            }
+
+            if(state.needsGAD7) {
+                const gadRes = getGADAction(state.gad7Score);
+                state.gadLevel = gadRes.level;
+                if (state.gad7Score <= 9) showEducation = true;
+
+                detailContainer.innerHTML += `
+                <div class="bg-white border-l-8 border-purple-500 rounded-lg shadow-sm p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-lg text-gray-800">Keputusan Kebimbangan (GAD-7)</h4>
+                            <div class="text-3xl font-extrabold ${gadRes.color} mt-2">${state.gad7Score}/21</div>
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gray-100 ${gadRes.color} mt-1">${gadRes.level}</span>
+                        </div>
+                        <i class="fas fa-wind text-purple-200 text-5xl"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <p class="text-sm font-semibold text-gray-600">Tindakan Disyorkan:</p>
+                        <p class="text-gray-800 italic">${gadRes.action}</p>
+                    </div>
+                </div>`;
+            }
+
+            if(showEducation) {
+                educationSection.classList.remove('hidden');
+            }
+
+            // AUTO SUBMIT TO GOOGLE SHEET
+            if(GOOGLE_SCRIPT_URL) {
+                submitToGoogleSheet();
+            }
+
+            preparePrintData();
+            goToSection('sectionResult');
+        }
+
+        // --- AUTOMATED Submit to Google Sheet Function ---
+        function submitToGoogleSheet() {
+            if(!GOOGLE_SCRIPT_URL) return;
+
+            var toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+
+            const statusWhooley = state.whooley ? "Positif" : "Negatif";
+            const statusGAD2 = state.gad2 ? "Positif" : "Negatif";
+            const saringanAwal = (state.whooley || state.gad2) ? "BERISIKO" : "TIDAK BERISIKO";
+
+            // Data payload matching requirements: TimeStamp, Maklumat Diri, Dapatan Saringan
+            const formData = {
+                timestamp: new Date().toISOString(),
+                nama: document.getElementById('nama').value.toUpperCase(),
+                ic: document.getElementById('ic').value,
+                umur: document.getElementById('umur').value,
+                jantina: document.getElementById('jantina').value,
+                jawatan: document.getElementById('jawatan').value.toUpperCase(),
+                gred: document.getElementById('gred').value.toUpperCase(),
+                daerah: document.getElementById('daerah').value,
+                ptj: document.getElementById('ptj').value,
+                tempat: document.getElementById('tempat').value.toUpperCase(),
+                
+                whooleyStatus: statusWhooley,
+                gad2Status: statusGAD2,
+                keputusanAwal: saringanAwal,
+                
+                phq9Score: state.needsPHQ9 ? state.phq9Score : 'N/A',
+                phq9Level: state.needsPHQ9 ? state.phqLevel : 'N/A',
+                suicideRisk: state.suicideRisk ? "YA" : "TIDAK",
+                
+                gad7Score: state.needsGAD7 ? state.gad7Score : 'N/A',
+                gad7Level: state.needsGAD7 ? state.gadLevel : 'N/A'
+            };
+
+            // Send Data via fetch without cors
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+            .catch(error => {
+                console.error("Error submitting data:", error);
+            });
+        }
+    </script>
+</body>
+</html>
