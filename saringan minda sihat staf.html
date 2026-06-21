@@ -676,6 +676,27 @@
                     </a>
                 </div>
                 
+                <!-- Unit Psikologi Kaunseling Banner -->
+                <div class="mt-4 bg-teal-50 border border-teal-200 p-6 rounded-xl shadow-sm text-center xl:text-left flex flex-col xl:flex-row items-center justify-between no-print">
+                    <div class="mb-4 xl:mb-0">
+                        <h3 class="text-lg font-bold text-teal-800 flex items-center justify-center xl:justify-start uppercase">
+                            <i class="fas fa-user-md mr-2"></i> Anda Boleh Menghubungi
+                        </h3>
+                        <p class="text-sm font-bold text-teal-600 mt-1 uppercase">Unit Psikologi Kaunseling JKN Kedah</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-3">
+                        <a href="tel:047741074" class="bg-white border-2 border-teal-500 text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600 px-5 py-2 rounded-full font-bold shadow-sm transition transform hover:scale-105 flex items-center justify-center">
+                            <i class="fas fa-phone-alt mr-2 text-sm"></i> 04-7741074
+                        </a>
+                        <a href="tel:047741075" class="bg-white border-2 border-teal-500 text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600 px-5 py-2 rounded-full font-bold shadow-sm transition transform hover:scale-105 flex items-center justify-center">
+                            <i class="fas fa-phone-alt mr-2 text-sm"></i> 04-7741075
+                        </a>
+                        <a href="tel:047742339" class="bg-white border-2 border-teal-500 text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600 px-5 py-2 rounded-full font-bold shadow-sm transition transform hover:scale-105 flex items-center justify-center">
+                            <i class="fas fa-phone-alt mr-2 text-sm"></i> 04-7742339
+                        </a>
+                    </div>
+                </div>
+                
                 <!-- Footer Actions -->
                 <div class="mt-10 flex flex-col md:flex-row justify-center space-y-3 md:space-y-0 md:space-x-4 no-print">
                     <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow flex items-center justify-center transition transform hover:scale-105">
@@ -945,7 +966,7 @@
             }
 
             if(score <= 4) return { level: "NORMAL", color: "text-green-600", action: "Teruskan amalan cara hidup sihat. Jaga kesihatan mental." };
-            if(score <= 9) return { level: "RINGAN", color: "text-yellow-600", action: "Kongsikan masalah dengan mereka yang anda percayai atau berbincang dengan penyelia / pasukan sokongan." };
+            if(score <= 9) return { level: "RINGAN", color: "text-yellow-600", action: "Kongsikan masalah dengan individu yang anda percayai atau berbincang dengan penyelia/pasukan sokongan. Dapatkan bantuan dan sesi kaunseling daripada Unit Psikologi Kaunseling JKN Kedah sekiranya memerlukan sokongan emosi dan psikologi." };
             if(score <= 14) return { level: "SEDERHANA", color: "text-orange-600", action: "Dapatkan bantuan di klinik kesihatan yang berdekatan atau melalui kaunselor jabatan." };
             if(score <= 19) return { level: "TERUK", color: "text-red-600", action: "<strong>SEGERA</strong> dapatkan bantuan dari klinik kesihatan atau hospital yang berdekatan." };
             return { level: "SANGAT TERUK", color: "text-red-800", action: "<strong>SEGERA</strong> dapatkan bantuan dari klinik kesihatan atau hospital yang berdekatan." };
